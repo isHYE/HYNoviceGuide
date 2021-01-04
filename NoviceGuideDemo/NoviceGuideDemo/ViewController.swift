@@ -120,6 +120,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         case 1: // 矩形引导
             
             if let cell = tableView.cellForRow(at: indexPath) {
+                
                 let guide = HYNoviceGuideManager(
                     [
                         .rectangle(RectangleGuideConfigModel(cornerRadius: 15,
@@ -138,6 +139,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
                                                                            location: .bottom())]))
                     ])
                 guide.startGuide()
+                
             }
             break
             
