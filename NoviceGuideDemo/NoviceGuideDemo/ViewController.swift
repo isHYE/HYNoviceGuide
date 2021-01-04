@@ -11,13 +11,40 @@ class ViewController: UIViewController {
     
     private let guideArray = ["圆形引导", "矩形引导"]
     
-    private var tableView = { () -> UITableView in
-        let tableView = UITableView(frame: CGRect(x: 0, y: 100, width: SCREEN_WIDTH, height: SCREEN_HEIGHT - 200), style: .plain)
+    private let pauseBtn: UIButton = {
+        let btn = UIButton(frame: CGRect(x: 30, y: 300, width: 60, height: 60))
+        btn.setImage(UIImage(named: "button_pause"), for: .normal)
+        return btn
+    }()
+    
+    private let tableView = { () -> UITableView in
+        let tableView = UITableView(frame: CGRect(x: 0, y: 88, width: SCREEN_WIDTH, height: SCREEN_HEIGHT - 200), style: .plain)
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         tableView.showsVerticalScrollIndicator = false
         tableView.backgroundColor = .clear
         tableView.separatorStyle = .none
         return tableView
+    }()
+    
+    /// 引导说明图
+    private let guideImgView: UIImageView = {
+        let imgView = UIImageView(image: UIImage(named: "xinshouyindao"))
+        return imgView
+    }()
+    
+    /// 引导
+    private lazy var remindLab = { () -> UILabel in
+        let lab = UILabel()
+        lab.text = "知道了"
+        lab.textColor = .white
+        lab.textAlignment = .center
+        lab.font = UIFont.systemFont(ofSize:  16)
+        lab.layer.cornerRadius = 4
+        lab.layer.masksToBounds = true
+        lab.layer.borderColor = UIColor.white.cgColor
+        lab.layer.borderWidth = 1
+        lab.backgroundColor = UIColor.white.withAlphaComponent(0.2)
+        return lab
     }()
     
     /// 确认
@@ -49,6 +76,8 @@ class ViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         view.addSubview(tableView)
+        
+        view.addSubview(pauseBtn)
     }
     
     @objc private func confrimBtnPressed() {
@@ -76,10 +105,16 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         
         switch indexPath.row {
         case 0: // 圆形引导
-            if let cell = tableView.cellForRow(at: indexPath) {
-                let guide = HYNoviceGuideManager([.circular(CircularGuideConfigModel(hollowView: cell))])
-                guide.startGuide()
-            }
+            let guide = HYNoviceGuideManager([.circular(CircularGuideConfigModel(hollowView: pauseBtn,
+                                                                                 guideArray: [(view: guideImgView,
+                                                                                               size: CGSize(width: 60, height: 50),
+                                                                                               location: .right(UIOffset(horizontal: 0, vertical: -40))),
+                                                                                              (view: noviceGuideConfirmLab,
+                                                                                                            size: CGSize(width: 80, height: 30),
+                                                                                                            location: .bottom(UIOffset(horizontal: 60, vertical: 0)))]))
+            ])
+            guide.startGuide()
+            
             break
             
         case 1: // 矩形引导
@@ -88,10 +123,10 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
                 let guide = HYNoviceGuideManager(
                     [
                         .rectangle(RectangleGuideConfigModel(cornerRadius: 15,
-                                                              hollowFrame: CGRect(x: 100, y: 100, width: 150, height: 30),
-                                                              guideArray: [(view: noviceGuideConfirmLab,
-                                                                            size: CGSize(width: 200, height: 50),
-                                                                            location: .bottom())])),
+                                                             hollowFrame: CGRect(x: 50, y: 0, width: SCREEN_WIDTH - 100, height: 64),
+                                                             guideArray: [(view: noviceGuideConfirmLab,
+                                                                           size: CGSize(width: 200, height: 50),
+                                                                           location: .bottom())])),
                         
                         .rectangle(RectangleGuideConfigModel(cornerRadius: 5,
                                                              hollowView: cell,
